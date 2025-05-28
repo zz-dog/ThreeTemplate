@@ -1,0 +1,8 @@
+node_modules
+.DS_Store
+dist
+coverage
+.env
+# Logs
+npm-debug.log*
+pnpm-lock.yaml
