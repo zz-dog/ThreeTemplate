@@ -1,3 +1,4 @@
-# threejs examples
+- 该项目对 threejs 进行了封装，提供了一个简单的接口来创建和管理 3D 场景。
 
-# How to run
+* 该项目使用了 TypeScript 编写，提供了类型安全的 API。
+* 减少用户对 threejs 的依赖，用户只需要关注业务逻辑，而不需要关心底层的渲染细节。
