@@ -5,7 +5,8 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "demo": "pnpm --filter demo run demo"
   },
   "keywords": [],
   "author": "",
@@ -14,9 +15,10 @@
   "devDependencies": {
     "@types/three": "^0.176.0",
     "r3f-perf": "^7.2.3",
+    "template": "workspace:^",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
-    "template": "workspace:^"
+    "vite-plugin-glsl": "^1.4.2"
   },
   "dependencies": {
     "@types/node": "^22.15.23",

@@ -7,14 +7,16 @@ import {
   PerspectiveCamera,
   Scene,
   TextureLoader,
+  WebGLRenderer,
 } from "three";
-import { WebGPURenderer } from "three/webgpu";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import Stats from "stats-gl";
 
-import type { CameraType } from "./type";
+import type { CameraType, Config, State } from "./type";
+import { Timer } from "three/examples/jsm/Addons.js";
+
 class App {
-  sizes = {
+  readonly sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
     aspect: () => {
@@ -25,20 +27,30 @@ class App {
       this.height = window.innerHeight;
     },
   };
-
+  readonly state: State;
+  readonly cameraType: CameraType;
+  readonly TargetCanvas: HTMLCanvasElement;
   readonly camera: Camera;
   readonly scene = new Scene();
-  readonly renderer = new WebGPURenderer({
-    antialias: true,
-  });
-  protected orbitControls: OrbitControls;
+  readonly renderer: WebGLRenderer;
+  readonly orbitControls: OrbitControls;
   readonly stats = new Stats();
   readonly textureLoader = new TextureLoader();
-
-  constructor(
-    readonly TargetCanvas: HTMLCanvasElement,
-    protected cameraType: CameraType = "PerspectiveCamera"
-  ) {
+  readonly animateTasks: ((elapsedtime?: number) => void)[] = [];
+  readonly clock = new Timer();
+  constructor(config: Config) {
+    const { targetCanvas, cameraType = "PerspectiveCamera", state } = config;
+    this.TargetCanvas = targetCanvas;
+    this.cameraType = cameraType;
+    this.state = state || {
+      enableOrbitControls: true,
+      enableStats: true,
+      customRender: false,
+    };
+    this.renderer = new WebGLRenderer({
+      canvas: this.TargetCanvas,
+      antialias: true,
+    });
     this.camera = this.initCamera(this.cameraType);
     this.camera.position.set(0, 0, 5);
     this.orbitControls = new OrbitControls(this.camera, this.TargetCanvas);
@@ -52,7 +64,17 @@ class App {
   animate() {
     this.stats.update();
     this.orbitControls.update();
+    const elapsedtime = this.clock.getElapsed();
+    this.animateTasks.forEach((task) => {
+      task(elapsedtime);
+    });
+    if (this.state.customRender) {
+      return;
+    }
     this.renderer.render(this.scene, this.camera);
+  }
+  addAnimateTask(task: (elapsedtime?: number) => void) {
+    this.animateTasks.push(task);
   }
   resize() {
     window.addEventListener("resize", () => {
@@ -73,15 +95,14 @@ class App {
     });
   }
   init() {
-    this.scene.add(this.camera);
-    this.renderer.domElement = this.TargetCanvas;
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     this.resize();
     document.body.appendChild(this.stats.dom);
     this.orbitControls.enableDamping = true;
-    this.renderer.setAnimationLoop(() => {
+    this.renderer.setAnimationLoop((time) => {
+      this.clock.update(time);
       this.animate();
     });
   }
