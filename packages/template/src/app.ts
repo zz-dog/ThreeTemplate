@@ -77,8 +77,6 @@ class App {
     this.renderer.domElement = this.TargetCanvas;
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x000000, 1);
-    // const box = this.testBox();
 
     this.resize();
     document.body.appendChild(this.stats.dom);
