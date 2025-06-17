@@ -1,7 +1,7 @@
 import App from "template";
 import "./index.css";
+import "./html";
 import {
-  BoxGeometry,
   Mesh,
   MeshBasicMaterial,
   OrthographicCamera,
@@ -15,7 +15,7 @@ import {
 } from "three";
 import fboVertex from "./shaders/fbo/vertex.glsl";
 import fboFragment from "./shaders/fbo/fragment.glsl";
-const canvas = document.querySelector<HTMLCanvasElement>("#root")!;
+const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 
 const app = new App({ targetCanvas: canvas, state: { customRender: true } });
 // background plane
@@ -55,17 +55,6 @@ const pointerTask = () => {
 
 app.addAnimateTask(pointerTask);
 
-//解决精度问题
-const whiteTarget = new WebGLRenderTarget(app.sizes.width, app.sizes.height);
-const whiteScene = new Scene();
-const whiteMesh = new Mesh(
-  new PlaneGeometry(100, 100),
-  new MeshBasicMaterial({
-    color: "white",
-  })
-);
-whiteMesh.position.set(0, 0, -1);
-whiteScene.add(whiteMesh);
 //renderpipeline
 const sourceTarget = new WebGLRenderTarget(app.sizes.width, app.sizes.height);
 let targetA = new WebGLRenderTarget(app.sizes.width, app.sizes.height);
@@ -79,7 +68,7 @@ const fboMesh = new Mesh(
     vertexShader: fboVertex,
     fragmentShader: fboFragment,
     uniforms: {
-      prevTexture: { value: whiteTarget.texture },
+      prevTexture: { value: null },
       currentTexture: { value: targetB.texture },
       uTime: { value: 0 },
     },
@@ -95,8 +84,8 @@ const finalMesh = new Mesh(
 );
 finalScne.add(finalMesh);
 
-app.renderer.setRenderTarget(whiteTarget);
-app.renderer.render(whiteScene, app.camera);
+// app.renderer.setRenderTarget(whiteTarget);
+// app.renderer.render(whiteScene, app.camera);
 
 const customRender = (elapsedtime?: number) => {
   // 1. 渲染主场景到 sourceTarget

@@ -30,11 +30,10 @@ vec4 rainbow(float t) {
 }
 
 void main() {
-  // vec4 prevColor = texture2D(prevTexture, vUv);
+
   vec4 currentColor = texture2D(currentTexture, vUv);
-  float noise = perlin3D(vec3(vUv * 8.0, uTime ));
-  // float noise = perlin3D(vec3(vUv * 8.0, uTime * 0.1));
-  vec2 aspect = (noise  + 1.0)* vec2(1.0,1.6) * 0.0003;
+  float noise = perlin3D(vec3(vUv * 8.0, uTime* 0.5 ));
+  vec2 aspect = (noise  + 1.0)* vec2(1.0,1.6) * 0.0005;
   vec4 texel = texture2D(prevTexture, vUv);
   vec4 texel1= texture2D(prevTexture, vec2(vUv.x + aspect.x, vUv.y+ aspect.y));
   vec4 texel2= texture2D(prevTexture, vec2(vUv.x - aspect.x, vUv.y- aspect.y));
@@ -43,14 +42,10 @@ void main() {
 vec4 blend1 = blendColor(texel2, texel1);
 vec4 blend2 = blendColor(texel3, texel4);
 vec4 prevColor = mixBlendColor(blend1, blend2, 0.5);
-prevColor = mixBlendColor(texel, prevColor, 0.6);
 prevColor  = prevColor.rgba + 0.005;
-// prevColor = (prevColor + currentColor) * 0.5;
-// prevColor = max(prevColor, currentColor);
 vec4 rColor = rainbow( uTime * 0.1);
 vec4 reset = resetColor(currentColor, rColor);
 
   gl_FragColor = min(prevColor, reset);
-  //  gl_FragColor =  waterColor(prevColor, currentColor,0.8)
-  //  gl_FragColor =  currentColor + prevColor;
+
 }
